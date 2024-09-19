@@ -1,0 +1,38 @@
+- name: Create User With sudo
+  hosts: all
+  become: true
+  vars:
+    new_user_name: "{{ lookup('ansible.builtin.env', 'USER', default=Undefined) }}"
+    new_user_ssh_key: "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"
+  tasks:
+    - name: Add user
+      user:
+        shell: "/bin/bash"
+        name: "{{ new_user_name }}"
+        password: "!"
+
+    - name: Add ssh key
+      when: new_user_ssh_key is defined
+      authorized_key:
+        key: "{{ new_user_ssh_key }}"
+        user: "{{ new_user_name }}"
+
+    - name: Add user to sudoers
+      copy:
+        content: '{{ new_user_name }} ALL=(ALL) NOPASSWD:ALL'
+        dest: "/etc/sudoers.d/{{ new_user_name }}"
+        mode: 0440
+
+    - name: Disable root login
+      register: sshd_config
+      lineinfile:
+        path: "/etc/ssh/sshd_config"
+        regexp: "^PermitRootLogin "
+        line: "PermitRootLogin no"
+
+    - name: Reload ssh
+      systemd:
+        name: ssh
+        enabled: true
+        state: reloaded
+      when: sshd_config is changed

@@ -1,0 +1,40 @@
+- name: Run Traefik
+  hosts: all
+  become: true
+  vars:
+    app_name: "simple-app"
+    branch: master
+  tasks:
+    - name: Create app network
+      docker_network:
+        name: app-net
+
+    - name: Clone repository from GitHub
+      git:
+        repo: "https://{{ github_username }}:{{ github_access_token }}@{{ github_repo }}.git"
+        dest: "{{ home_path }}/{{ app_name }}"
+        version: "{{ branch | default('master') }}"
+
+    - name: Build Docker image from Dockerfile
+      docker_image:
+        name: "{{ app_name }}:latest"
+        build:
+          path: "{{ home_path }}/{{ app_name }}"
+          pull: true
+          nocache: false
+
+    - name: Create and run Docker container
+      docker_container:
+        name: "{{ app_name }}"
+        image: "{{ app_name }}:latest"
+        networks:
+          - name: app-net
+        ports:
+          - "8080:8080"
+        restart_policy: always
+        labels:
+          "traefik.enable": "true"
+          "traefik.http.routers.app.rule": "Host(`{{ ansible_host }}`)"
+          "traefik.http.routers.app.entrypoints": "websecure"
+          "traefik.http.routers.app.tls.certresolver": "letsencrypt"
+        state: started
