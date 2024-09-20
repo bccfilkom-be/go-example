@@ -1,0 +1,11 @@
+.git
+playbooks
+.envrc
+.gitignore
+Dockerfile
+LICENSE
+Makefile
+README.md
+flake.lock
+flake.nix
+inventory.yaml
