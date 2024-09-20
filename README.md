@@ -11,11 +11,11 @@ ansible-playbook -i inventory.yaml --vault-password-file {password-file-path} pl
 ### Create Vault
 
 ```bash
-ansible-vault encrypt_string --vault-password-file .vault-password '${cat (filenya-jangan-string)}' --name 'password'
+ansible-vault encrypt_string --vault-password-file {password-file-path} 'string' --name 'password'
 ```
 
 ### Ping
 
 ```bash
-ansible -i inventory.yaml --vault-password-file .vault-password vm-demo -m ping
+ansible -i inventory.yaml --vault-password-file {password-file-path} vm-demo -m ping
 ```

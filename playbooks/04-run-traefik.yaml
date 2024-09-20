@@ -1,6 +1,8 @@
 - name: Run Traefik
   hosts: all
   become: true
+  vars:
+    email_resolver: (email)
   tasks:
     - name: Create app network
       docker_network:
@@ -31,5 +33,5 @@
           - "--entryPoints.websecure.address=:443"
           - "--certificatesresolvers.letsencrypt.acme.httpchallenge=true"
           - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-          - "--certificatesresolvers.letsencrypt.acme.email=akbarfikriabdillah@gmail.com"
+          - "--certificatesresolvers.letsencrypt.acme.email={{ email_resolver }}"
           - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
