@@ -2,8 +2,8 @@ all:
   vars:
     volume_path: "/home/{{ ansible_env.SUDO_USER or ansible_user_id }}/docker_volume"
     home_path: "~"
-    github_username: AkbarFikri
-    github_repo: ""
+    github_username: bccfilkom-be
+    github_repo: go-example
     github_access_token: !vault |
           $ANSIBLE_VAULT;1.1;AES256
           64366132363962373136316337373962623932666366656333326632626132363863646234646433
