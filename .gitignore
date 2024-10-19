@@ -1,3 +1,5 @@
 .vault-password
 ssh-password
 github-token
+.envrc
+flake.lock
