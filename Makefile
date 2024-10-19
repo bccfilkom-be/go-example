@@ -1,2 +1,4 @@
-run:
-	@go run cmd/api/main.go
+simple_http/run:
+	@go run ./simple_http
+
+.PHONY: simple_http/run
