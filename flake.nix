@@ -30,6 +30,7 @@
           gopls
           gotools
           golangci-lint
+          openapi-generator-cli
         ];
       };
     });
