@@ -1,4 +1,7 @@
 simple_http/run:
 	@go run ./simple_http
 
-.PHONY: simple_http/run
+oas/validate:
+	@openapi-generator-cli validate -i ${spec}
+
+.PHONY: simple_http/run oas/validate
