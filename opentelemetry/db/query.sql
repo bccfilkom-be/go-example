@@ -8,9 +8,9 @@ SELECT
 FROM
   pets
 LIMIT
-  "$1::integer"
+  @_limit::integer
 OFFSET
-  "$2::integer";
+  @_offset::integer;
 
 -- name: CountPets :one
 SELECT

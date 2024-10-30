@@ -35,10 +35,15 @@ SELECT
 FROM
   pets
 LIMIT
-  "$1::integer"
+  $2::integer
 OFFSET
-  "$2::integer"
+  $1::integer
 `
+
+type ListPetsParams struct {
+	Offset int32
+	Limit  int32
+}
 
 type ListPetsRow struct {
 	ID         int64
@@ -48,8 +53,8 @@ type ListPetsRow struct {
 	Sold       bool
 }
 
-func (q *Queries) ListPets(ctx context.Context) ([]ListPetsRow, error) {
-	rows, err := q.db.Query(ctx, listPets)
+func (q *Queries) ListPets(ctx context.Context, arg ListPetsParams) ([]ListPetsRow, error) {
+	rows, err := q.db.Query(ctx, listPets, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
