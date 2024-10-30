@@ -25,6 +25,68 @@ func (q *Queries) CountPets(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const createPet = `-- name: CreatePet :one
+INSERT INTO
+  pets (name, photoURL) VALUES ($1, $2) RETURNING id
+`
+
+type CreatePetParams struct {
+	Name     string
+	Photourl string
+}
+
+func (q *Queries) CreatePet(ctx context.Context, arg CreatePetParams) (int64, error) {
+	row := q.db.QueryRow(ctx, createPet, arg.Name, arg.Photourl)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const deletePet = `-- name: DeletePet :exec
+DELETE FROM pets
+WHERE
+  id = $1
+`
+
+func (q *Queries) DeletePet(ctx context.Context, id int64) error {
+	_, err := q.db.Exec(ctx, deletePet, id)
+	return err
+}
+
+const getPet = `-- name: GetPet :one
+SELECT
+  id,
+  category_id,
+  name,
+  photoURL,
+  sold
+FROM
+  pets
+WHERE
+  id = $1
+`
+
+type GetPetRow struct {
+	ID         int64
+	CategoryID pgtype.Int8
+	Name       string
+	Photourl   string
+	Sold       bool
+}
+
+func (q *Queries) GetPet(ctx context.Context, id int64) (GetPetRow, error) {
+	row := q.db.QueryRow(ctx, getPet, id)
+	var i GetPetRow
+	err := row.Scan(
+		&i.ID,
+		&i.CategoryID,
+		&i.Name,
+		&i.Photourl,
+		&i.Sold,
+	)
+	return i, err
+}
+
 const listPets = `-- name: ListPets :many
 SELECT
   id,
@@ -77,4 +139,22 @@ func (q *Queries) ListPets(ctx context.Context, arg ListPetsParams) ([]ListPetsR
 		return nil, err
 	}
 	return items, nil
+}
+
+const updatePet = `-- name: UpdatePet :exec
+UPDATE pets
+SET
+  name = $2
+WHERE
+  id = $1
+`
+
+type UpdatePetParams struct {
+	ID   int64
+	Name string
+}
+
+func (q *Queries) UpdatePet(ctx context.Context, arg UpdatePetParams) error {
+	_, err := q.db.Exec(ctx, updatePet, arg.ID, arg.Name)
+	return err
 }
