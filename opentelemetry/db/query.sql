@@ -1,4 +1,4 @@
--- name: FetchPets :many
+-- name: ListPets :many
 SELECT
   id,
   category_id,

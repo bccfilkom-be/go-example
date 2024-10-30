@@ -7,10 +7,13 @@ goose_env=${goose_conn} GOOSE_MIGRATION_DIR=${migration_dir}
 run:
 	@go run cmd/api/main.go
 
-db/migrate:
+goose/up:
 	@${goose_env} goose up
 
-db/status:
+goose/status:
 	@${goose_env} goose status
 
-.PHONY: run db/migrate db/status
+sqlc/gen:
+	@cd db && sqlc generate
+
+.PHONY: run db/migrate db/status sqlc/gen
