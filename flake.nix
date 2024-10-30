@@ -32,6 +32,7 @@
           gotools
           golangci-lint
           nodePackages.sql-formatter
+          sqlc
         ];
       };
     });
