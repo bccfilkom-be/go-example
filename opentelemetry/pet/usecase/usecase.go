@@ -16,10 +16,10 @@ type IPetUsecase interface {
 }
 
 type usecase struct {
-	postgresql postgresql.Queries
+	postgresql *postgresql.Queries
 }
 
-func NewPetUsecase(postgresql postgresql.Queries) IPetUsecase {
+func NewPetUsecase(postgresql *postgresql.Queries) IPetUsecase {
 	return &usecase{postgresql}
 }
 
@@ -33,7 +33,7 @@ func (u *usecase) ListPets(ctx context.Context, offset, limit int32) ([]dto.Pet,
 		_pets = append(_pets, dto.Pet{
 			ID:       pet.ID,
 			Name:     pet.Name,
-			PhotoURL: pet.Photourl,
+			PhotoURL: pet.PhotoUrl,
 			Sold:     pet.Sold,
 		})
 	}
@@ -48,14 +48,14 @@ func (u *usecase) GetPet(ctx context.Context, id int64) (dto.Pet, error) {
 	_pet := dto.Pet{
 		ID:       pet.ID,
 		Name:     pet.Name,
-		PhotoURL: pet.Photourl,
+		PhotoURL: pet.PhotoUrl,
 		Sold:     pet.Sold,
 	}
 	return _pet, nil
 }
 
 func (u *usecase) CreatePet(ctx context.Context, pet dto.Pet) error {
-	if _, err := u.postgresql.CreatePet(ctx, postgresql.CreatePetParams{Name: pet.Name, Photourl: pet.PhotoURL}); err != nil {
+	if _, err := u.postgresql.CreatePet(ctx, postgresql.CreatePetParams{Name: pet.Name, PhotoUrl: pet.PhotoURL}); err != nil {
 		return err
 	}
 	return nil

@@ -10,20 +10,51 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/bccfilkom-be/go-example/opentelemetry/common"
+	"github.com/bccfilkom-be/go-example/opentelemetry/db/postgresql"
+	"github.com/bccfilkom-be/go-example/opentelemetry/pet/rest"
+	"github.com/bccfilkom-be/go-example/opentelemetry/pet/usecase"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("Error loading .env file: %v\n", err)
+	}
+}
 
 func mux() http.Handler {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Logger)
 
-	v1 := chi.NewRouter()
-	v1.Get("/status", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Healthy"))
-	})
-	r.Mount("/api/v1", v1)
+	uri := fmt.Sprintf(
+		"postgres://%s:%s@%s:%s/%s",
+		os.Getenv("DB_USERNAME"),
+		os.Getenv("DB_PASSWD"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
+		os.Getenv("DB_NAME"),
+	)
+	cfg, err := pgxpool.ParseConfig(uri)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	poll, err := common.NewPostgreSQLPool(cfg)
+	if err != nil {
+		log.Fatalf("Unable to connect to database: %v\n", err)
+	}
+	defer poll.Close()
+
+	petAPI := chi.NewRouter()
+	postgresql := postgresql.New(poll)
+	petUsecase := usecase.NewPetUsecase(postgresql)
+	petHandler := rest.NewPetHandler(petUsecase)
+	petHandler.Register(petAPI)
+	r.Mount("/api/v1/pets", petAPI)
 
 	return r
 }
