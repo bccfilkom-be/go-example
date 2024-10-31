@@ -47,7 +47,6 @@ func mux() http.Handler {
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
-	defer poll.Close()
 
 	petAPI := chi.NewRouter()
 	postgresql := postgresql.New(poll)

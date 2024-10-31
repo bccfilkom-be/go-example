@@ -16,4 +16,7 @@ goose/status:
 sqlc/gen:
 	@cd db && sqlc generate
 
-.PHONY: run db/migrate db/status sqlc/gen
+test:
+	@cd test && hurl --test --verbose http.hurl
+
+.PHONY: run db/migrate db/status sqlc/gen test

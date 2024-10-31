@@ -7,6 +7,8 @@ import (
 	"github.com/bccfilkom-be/go-example/opentelemetry/pet/dto"
 )
 
+var paginationSize = int32(25)
+
 type IPetUsecase interface {
 	ListPets(ctx context.Context, offset, limit int32) ([]dto.Pet, error)
 	GetPet(ctx context.Context, id int64) (dto.Pet, error)
@@ -23,8 +25,8 @@ func NewPetUsecase(postgresql *postgresql.Queries) IPetUsecase {
 	return &usecase{postgresql}
 }
 
-func (u *usecase) ListPets(ctx context.Context, offset, limit int32) ([]dto.Pet, error) {
-	pets, err := u.postgresql.ListPets(ctx, postgresql.ListPetsParams{Offset: offset, Limit: limit})
+func (u *usecase) ListPets(ctx context.Context, page, size int32) ([]dto.Pet, error) {
+	pets, err := u.postgresql.ListPets(ctx, postgresql.ListPetsParams{Offset: page, Limit: paginationSize})
 	if err != nil {
 		return nil, err
 	}

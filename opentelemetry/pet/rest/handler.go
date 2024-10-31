@@ -33,18 +33,17 @@ func (h *handler) pets(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	query := r.URL.Query()
-	_limit, err := strconv.ParseInt(query.Get("limit"), 10, 32)
+	_page, err := strconv.ParseInt(query.Get("page"), 10, 32)
 	if err != nil {
 		httperr.NewError(w, err, http.StatusBadRequest)
 		return
 	}
-	_offset, err := strconv.ParseInt(query.Get("offset"), 10, 32)
+	var page int32 = int32(_page)
+	pets, err := h.petUsecase.ListPets(ctx, page, 0)
 	if err != nil {
-		httperr.NewError(w, err, http.StatusBadRequest)
+		httperr.NewError(w, err, http.StatusInternalServerError)
 		return
 	}
-	var limit, offset int32 = int32(_limit), int32(_offset)
-	pets, err := h.petUsecase.ListPets(ctx, offset, limit)
 	parsed, err := json.Marshal(pets)
 	if err != nil {
 		httperr.NewError(w, err, http.StatusInternalServerError)
