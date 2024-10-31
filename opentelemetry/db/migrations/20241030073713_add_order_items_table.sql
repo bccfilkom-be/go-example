@@ -3,7 +3,7 @@
 CREATE TABLE "order_items" (
   id BIGSERIAL PRIMARY KEY,
   name TEXT NOT NULL,
-  photoURL TEXT NOT NULL,
+  photo_url TEXT NOT NULL,
   category TEXT NOT NULL
 );
 

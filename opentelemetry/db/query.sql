@@ -1,9 +1,8 @@
 -- name: ListPets :many
 SELECT
   id,
-  category_id,
   name,
-  photoURL,
+  photo_url,
   sold
 FROM
   pets
@@ -21,9 +20,8 @@ FROM
 -- name: GetPet :one
 SELECT
   id,
-  category_id,
   name,
-  photoURL,
+  photo_url,
   sold
 FROM
   pets
@@ -32,7 +30,7 @@ WHERE
 
 -- name: CreatePet :one
 INSERT INTO
-  pets (name, photoURL) VALUES ($1, $2) RETURNING id;
+  pets (name, photo_url) VALUES ($1, $2) RETURNING id;
 
 -- name: UpdatePet :exec
 UPDATE pets

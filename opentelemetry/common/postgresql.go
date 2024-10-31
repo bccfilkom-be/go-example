@@ -1,17 +1,25 @@
-package app
+package common
 
 import (
 	"context"
-	"log"
 	"os"
 
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func NewPostgreSQL(url string) *pgx.Conn {
-	conn, err := pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+func NewPostgreSQL(cfg *pgx.ConnConfig) (*pgx.Conn, error) {
+	conn, err := pgx.ConnectConfig(context.Background(), cfg)
 	if err != nil {
-		log.Fatalf("Unable to connect to database: %v\n", err)
+		return nil, err
 	}
-	return conn
+	return conn, nil
+}
+
+func NewPostgreSQLPool(url string) (*pgxpool.Pool, error) {
+	conn, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
 }

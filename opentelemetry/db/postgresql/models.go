@@ -129,17 +129,15 @@ type Order struct {
 type OrderItem struct {
 	ID       int64
 	Name     string
-	Photourl string
+	PhotoUrl string
 	Category string
 }
 
 type Pet struct {
-	ID         int64
-	CategoryID pgtype.Int8
-	Name       string
-	Photourl   string
-	Sold       bool
-	Slug       string
+	ID       int64
+	Name     string
+	PhotoUrl string
+	Sold     bool
 }
 
 type PetTag struct {

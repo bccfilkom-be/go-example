@@ -7,8 +7,6 @@ package postgresql
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countPets = `-- name: CountPets :one
@@ -27,16 +25,16 @@ func (q *Queries) CountPets(ctx context.Context) (int64, error) {
 
 const createPet = `-- name: CreatePet :one
 INSERT INTO
-  pets (name, photoURL) VALUES ($1, $2) RETURNING id
+  pets (name, photo_url) VALUES ($1, $2) RETURNING id
 `
 
 type CreatePetParams struct {
 	Name     string
-	Photourl string
+	PhotoUrl string
 }
 
 func (q *Queries) CreatePet(ctx context.Context, arg CreatePetParams) (int64, error) {
-	row := q.db.QueryRow(ctx, createPet, arg.Name, arg.Photourl)
+	row := q.db.QueryRow(ctx, createPet, arg.Name, arg.PhotoUrl)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -56,9 +54,8 @@ func (q *Queries) DeletePet(ctx context.Context, id int64) error {
 const getPet = `-- name: GetPet :one
 SELECT
   id,
-  category_id,
   name,
-  photoURL,
+  photo_url,
   sold
 FROM
   pets
@@ -66,22 +63,13 @@ WHERE
   id = $1
 `
 
-type GetPetRow struct {
-	ID         int64
-	CategoryID pgtype.Int8
-	Name       string
-	Photourl   string
-	Sold       bool
-}
-
-func (q *Queries) GetPet(ctx context.Context, id int64) (GetPetRow, error) {
+func (q *Queries) GetPet(ctx context.Context, id int64) (Pet, error) {
 	row := q.db.QueryRow(ctx, getPet, id)
-	var i GetPetRow
+	var i Pet
 	err := row.Scan(
 		&i.ID,
-		&i.CategoryID,
 		&i.Name,
-		&i.Photourl,
+		&i.PhotoUrl,
 		&i.Sold,
 	)
 	return i, err
@@ -90,9 +78,8 @@ func (q *Queries) GetPet(ctx context.Context, id int64) (GetPetRow, error) {
 const listPets = `-- name: ListPets :many
 SELECT
   id,
-  category_id,
   name,
-  photoURL,
+  photo_url,
   sold
 FROM
   pets
@@ -107,28 +94,19 @@ type ListPetsParams struct {
 	Limit  int32
 }
 
-type ListPetsRow struct {
-	ID         int64
-	CategoryID pgtype.Int8
-	Name       string
-	Photourl   string
-	Sold       bool
-}
-
-func (q *Queries) ListPets(ctx context.Context, arg ListPetsParams) ([]ListPetsRow, error) {
+func (q *Queries) ListPets(ctx context.Context, arg ListPetsParams) ([]Pet, error) {
 	rows, err := q.db.Query(ctx, listPets, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListPetsRow
+	var items []Pet
 	for rows.Next() {
-		var i ListPetsRow
+		var i Pet
 		if err := rows.Scan(
 			&i.ID,
-			&i.CategoryID,
 			&i.Name,
-			&i.Photourl,
+			&i.PhotoUrl,
 			&i.Sold,
 		); err != nil {
 			return nil, err
