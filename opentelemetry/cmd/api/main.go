@@ -44,7 +44,7 @@ func main() {
 	)
 	cfg, err := pgxpool.ParseConfig(uri)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Unable to parse database config: %v\n", err)
 	}
 	poll, err := common.NewPostgreSQLPool(cfg)
 	if err != nil {
@@ -54,12 +54,12 @@ func main() {
 
 	grpcConn, err := grpc.NewClient(":4317", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Fail to start gRPC channel: %v\n", err)
 	}
 
 	exp, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(grpcConn))
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Fail to start trace exporter: %v\n", err)
 	}
 	res, err := resource.Merge(
 		resource.Default(),
