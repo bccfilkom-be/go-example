@@ -12,8 +12,8 @@ var paginationSize = int32(25)
 type IPetUsecase interface {
 	ListPets(ctx context.Context, offset, limit int32) ([]dto.Pet, error)
 	GetPet(ctx context.Context, id int64) (dto.Pet, error)
-	CreatePet(ctx context.Context, pet dto.Pet) error
-	UpdatePet(ctx context.Context, pet dto.Pet) error
+	CreatePet(ctx context.Context, pet *dto.Pet) error
+	UpdatePet(ctx context.Context, pet *dto.Pet) error
 	DeletePet(ctx context.Context, id int64) error
 }
 
@@ -56,14 +56,14 @@ func (u *usecase) GetPet(ctx context.Context, id int64) (dto.Pet, error) {
 	return _pet, nil
 }
 
-func (u *usecase) CreatePet(ctx context.Context, pet dto.Pet) error {
+func (u *usecase) CreatePet(ctx context.Context, pet *dto.Pet) error {
 	if _, err := u.postgresql.CreatePet(ctx, postgresql.CreatePetParams{Name: pet.Name, PhotoUrl: pet.PhotoURL}); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *usecase) UpdatePet(ctx context.Context, pet dto.Pet) error {
+func (u *usecase) UpdatePet(ctx context.Context, pet *dto.Pet) error {
 	if err := u.postgresql.UpdatePet(ctx, postgresql.UpdatePetParams{ID: pet.ID, Name: pet.Name}); err != nil {
 		return err
 	}

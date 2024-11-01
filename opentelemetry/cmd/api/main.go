@@ -60,6 +60,8 @@ func mux() http.Handler {
 
 func main() {
 	server := &http.Server{Addr: ":8080", Handler: mux()}
+
+	// graceful shutdown
 	ctx, cancel := context.WithCancel(context.Background())
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
