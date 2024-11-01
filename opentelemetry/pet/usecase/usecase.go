@@ -5,6 +5,7 @@ import (
 
 	"github.com/bccfilkom-be/go-example/opentelemetry/db/postgresql"
 	"github.com/bccfilkom-be/go-example/opentelemetry/pet/dto"
+	"go.opentelemetry.io/otel/trace"
 )
 
 var paginationSize = int32(25)
@@ -19,13 +20,17 @@ type IPetUsecase interface {
 
 type usecase struct {
 	postgresql *postgresql.Queries
+	tracer     trace.Tracer
 }
 
-func NewPetUsecase(postgresql *postgresql.Queries) IPetUsecase {
-	return &usecase{postgresql}
+func NewPetUsecase(postgresql *postgresql.Queries, tracer trace.Tracer) IPetUsecase {
+	return &usecase{postgresql, tracer}
 }
 
 func (u *usecase) ListPets(ctx context.Context, page, size int32) ([]dto.Pet, error) {
+	ctx, span := u.tracer.Start(ctx, "usecase")
+	defer span.End()
+
 	pets, err := u.postgresql.ListPets(ctx, postgresql.ListPetsParams{Offset: page, Limit: paginationSize})
 	if err != nil {
 		return nil, err
@@ -43,6 +48,9 @@ func (u *usecase) ListPets(ctx context.Context, page, size int32) ([]dto.Pet, er
 }
 
 func (u *usecase) GetPet(ctx context.Context, id int64) (dto.Pet, error) {
+	ctx, span := u.tracer.Start(ctx, "usecase")
+	defer span.End()
+
 	pet, err := u.postgresql.GetPet(ctx, id)
 	if err != nil {
 		return dto.Pet{}, err
@@ -57,6 +65,9 @@ func (u *usecase) GetPet(ctx context.Context, id int64) (dto.Pet, error) {
 }
 
 func (u *usecase) CreatePet(ctx context.Context, pet *dto.Pet) error {
+	ctx, span := u.tracer.Start(ctx, "usecase")
+	defer span.End()
+
 	if _, err := u.postgresql.CreatePet(ctx, postgresql.CreatePetParams{Name: pet.Name, PhotoUrl: pet.PhotoURL}); err != nil {
 		return err
 	}
@@ -64,6 +75,9 @@ func (u *usecase) CreatePet(ctx context.Context, pet *dto.Pet) error {
 }
 
 func (u *usecase) UpdatePet(ctx context.Context, pet *dto.Pet) error {
+	ctx, span := u.tracer.Start(ctx, "usecase")
+	defer span.End()
+
 	if err := u.postgresql.UpdatePet(ctx, postgresql.UpdatePetParams{ID: pet.ID, Name: pet.Name}); err != nil {
 		return err
 	}
@@ -71,5 +85,8 @@ func (u *usecase) UpdatePet(ctx context.Context, pet *dto.Pet) error {
 }
 
 func (u *usecase) DeletePet(ctx context.Context, id int64) error {
+	ctx, span := u.tracer.Start(ctx, "usecase")
+	defer span.End()
+
 	return u.postgresql.DeletePet(ctx, id)
 }

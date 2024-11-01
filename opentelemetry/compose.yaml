@@ -1,0 +1,26 @@
+services:
+  backend:
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgresql
+
+  postgresql:
+    image: postgres:17.0-alpine3.20
+    environment:
+     POSTGRES_USER: opentelemetry
+     POSTGRES_PASSWORD: admin 
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.112.0
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./otel-collector.yaml:/etc/otel-collector.yaml
+    ports:
+      - 4317:4317
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.60
+    ports:
+      - 16686:16686

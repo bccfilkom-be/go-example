@@ -1,16 +1,15 @@
 package rest
 
 import (
-	"context"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/bccfilkom-be/go-example/opentelemetry/httperr"
 	"github.com/bccfilkom-be/go-example/opentelemetry/pet/dto"
 	"github.com/bccfilkom-be/go-example/opentelemetry/pet/usecase"
 	"github.com/go-chi/chi/v5"
 	"github.com/goccy/go-json"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type IPetHandler interface {
@@ -19,10 +18,11 @@ type IPetHandler interface {
 
 type handler struct {
 	petUsecase usecase.IPetUsecase
+	tracer     trace.Tracer
 }
 
-func NewPetHandler(petUsecase usecase.IPetUsecase) IPetHandler {
-	return &handler{petUsecase}
+func NewPetHandler(petUsecase usecase.IPetUsecase, tracer trace.Tracer) IPetHandler {
+	return &handler{petUsecase, tracer}
 }
 
 func (h *handler) Register(r *chi.Mux) {
@@ -34,8 +34,9 @@ func (h *handler) Register(r *chi.Mux) {
 }
 
 func (h *handler) pets(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-	defer cancel()
+	ctx, span := h.tracer.Start(r.Context(), "handler")
+	defer span.End()
+
 	query := r.URL.Query()
 	_page, err := strconv.ParseInt(query.Get("page"), 10, 32)
 	if err != nil {
@@ -58,8 +59,9 @@ func (h *handler) pets(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) pet(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-	defer cancel()
+	ctx, span := h.tracer.Start(r.Context(), "handler")
+	defer span.End()
+
 	_id := chi.URLParam(r, "id")
 	id, err := strconv.ParseInt(_id, 10, 64)
 	if err != nil {
@@ -82,8 +84,9 @@ func (h *handler) pet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) createPet(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-	defer cancel()
+	ctx, span := h.tracer.Start(r.Context(), "handler")
+	defer span.End()
+
 	var payload dto.Pet
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		httperr.NewError(w, err, http.StatusInternalServerError)
@@ -98,8 +101,9 @@ func (h *handler) createPet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) updatePet(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-	defer cancel()
+	ctx, span := h.tracer.Start(r.Context(), "handler")
+	defer span.End()
+
 	_id := chi.URLParam(r, "id")
 	id, err := strconv.ParseInt(_id, 10, 64)
 	if err != nil {
@@ -121,8 +125,9 @@ func (h *handler) updatePet(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) deletePet(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-	defer cancel()
+	ctx, span := h.tracer.Start(r.Context(), "handler")
+	defer span.End()
+
 	_id := chi.URLParam(r, "id")
 	id, err := strconv.ParseInt(_id, 10, 64)
 	if err != nil {
