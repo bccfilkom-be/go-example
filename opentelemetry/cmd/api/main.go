@@ -17,7 +17,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -30,12 +30,6 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
-
-func init() {
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %v\n", err)
-	}
-}
 
 func main() {
 	ctx := context.Background()
