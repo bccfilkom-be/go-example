@@ -84,13 +84,13 @@ func (h *handler) pet(w http.ResponseWriter, r *http.Request) {
 func (h *handler) createPet(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
-	var payload *dto.Pet
-	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
+	var payload dto.Pet
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		httperr.NewError(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	if err := h.petUsecase.CreatePet(ctx, payload); err != nil {
+	if err := h.petUsecase.CreatePet(ctx, &payload); err != nil {
 		httperr.NewError(w, err, http.StatusInternalServerError)
 		return
 	}
@@ -106,18 +106,18 @@ func (h *handler) updatePet(w http.ResponseWriter, r *http.Request) {
 		httperr.NewError(w, err, http.StatusBadRequest)
 		return
 	}
-	var payload *dto.Pet
-	if err := json.NewDecoder(r.Body).Decode(payload); err != nil {
+	var payload dto.Pet
+	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		httperr.NewError(w, err, http.StatusInternalServerError)
 		return
 	}
 	payload.ID = id
 
-	if err := h.petUsecase.CreatePet(ctx, payload); err != nil {
+	if err := h.petUsecase.CreatePet(ctx, &payload); err != nil {
 		httperr.NewError(w, err, http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (h *handler) deletePet(w http.ResponseWriter, r *http.Request) {

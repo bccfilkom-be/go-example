@@ -7,6 +7,9 @@ goose_env=${goose_conn} GOOSE_MIGRATION_DIR=${migration_dir}
 run:
 	@go run cmd/api/main.go
 
+seed:
+	@go run cmd/seeder/main.go
+
 goose/up:
 	@${goose_env} goose up
 
@@ -17,6 +20,6 @@ sqlc/gen:
 	@cd db && sqlc generate
 
 test:
-	@cd test && hurl --test --verbose http.hurl
+	@cd test && hurl --test --very-verbose http.hurl
 
-.PHONY: run db/migrate db/status sqlc/gen test
+.PHONY: run db/migrate db/status sqlc/gen test seed
