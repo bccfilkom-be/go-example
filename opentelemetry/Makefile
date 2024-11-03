@@ -22,4 +22,31 @@ sqlc/gen:
 test:
 	@cd test && hurl --test --very-verbose http.hurl
 
-.PHONY: run db/migrate db/status sqlc/gen test seed
+compose/up:
+	@docker compose up -d
+
+compose/down:
+	@docker compose down
+
+compose/fresh:
+	@docker compose down
+	@docker compose up -d --build
+	# Waiting for database uptime
+	@sleep 4
+	@${goose_env} goose up
+	# Seeding database
+	@go run cmd/seeder/main.go
+
+compose/restart:
+	@docker compose down
+	@docker compose up -d
+	# Waiting for database uptime
+	@sleep 4
+	@${goose_env} goose up
+	# Seeding database
+	@go run cmd/seeder/main.go
+
+k6/run:
+	@k6 run test/script.js
+
+.PHONY: run db/migrate db/status sqlc/gen test seed compose/up compose/down compose/fresh compose/restart k6/run
