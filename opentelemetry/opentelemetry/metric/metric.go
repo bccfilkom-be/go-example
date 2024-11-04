@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func NewExporterConsole(res *resource.Resource) (metric.Exporter, error) {
+func NewExporterConsole() (metric.Exporter, error) {
 	return stdoutmetric.New()
 }
 
@@ -18,8 +18,9 @@ func NewExporterOTLP(ctx context.Context, conn *grpc.ClientConn) (*otlpmetricgrp
 	return otlpmetricgrpc.New(ctx, otlpmetricgrpc.WithGRPCConn(conn))
 }
 
-func NewProvider(exp metric.Exporter, res *resource.Resource) *metric.MeterProvider {
+func NewProvider(res *resource.Resource, exp metric.Exporter) *metric.MeterProvider {
 	return metric.NewMeterProvider(
 		metric.WithResource(res),
+		metric.WithReader(metric.NewPeriodicReader(exp)),
 	)
 }

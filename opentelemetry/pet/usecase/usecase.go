@@ -6,6 +6,7 @@ import (
 	"github.com/bccfilkom-be/go-example/opentelemetry/db/postgresql"
 	"github.com/bccfilkom-be/go-example/opentelemetry/pet/dto"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 )
 
 var paginationSize = int32(25)
@@ -21,10 +22,11 @@ type IPetUsecase interface {
 type usecase struct {
 	postgresql *postgresql.Queries
 	tracer     trace.Tracer
+	_log       *zap.Logger
 }
 
-func NewPetUsecase(postgresql *postgresql.Queries, tracer trace.Tracer) IPetUsecase {
-	return &usecase{postgresql, tracer}
+func NewPetUsecase(postgresql *postgresql.Queries, tracer trace.Tracer, _log *zap.Logger) IPetUsecase {
+	return &usecase{postgresql, tracer, _log}
 }
 
 func (u *usecase) ListPets(ctx context.Context, page, size int32) ([]dto.Pet, error) {
@@ -71,6 +73,7 @@ func (u *usecase) CreatePet(ctx context.Context, pet *dto.Pet) error {
 	if _, err := u.postgresql.CreatePet(ctx, postgresql.CreatePetParams{Name: pet.Name, PhotoUrl: pet.PhotoURL}); err != nil {
 		return err
 	}
+	u._log.Info("pet created", zap.String("name", pet.Name))
 	return nil
 }
 
@@ -81,6 +84,7 @@ func (u *usecase) UpdatePet(ctx context.Context, pet *dto.Pet) error {
 	if err := u.postgresql.UpdatePet(ctx, postgresql.UpdatePetParams{ID: pet.ID, Name: pet.Name}); err != nil {
 		return err
 	}
+	u._log.Info("pet updated", zap.String("name", pet.Name))
 	return nil
 }
 
@@ -88,5 +92,6 @@ func (u *usecase) DeletePet(ctx context.Context, id int64) error {
 	ctx, span := u.tracer.Start(ctx, "DeletePetUsecase")
 	defer span.End()
 
+	u._log.Info("pet deleted", zap.Int64("id", id))
 	return u.postgresql.DeletePet(ctx, id)
 }

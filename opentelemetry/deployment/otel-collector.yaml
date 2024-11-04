@@ -4,6 +4,8 @@ receivers:
     protocols:
       grpc:
 exporters:
+  logging:
+    loglevel: debug
   otlp:
     endpoint: tempo:4317
     tls:
@@ -12,4 +14,4 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      exporters: [otlp]
+      exporters: [logging, otlp]

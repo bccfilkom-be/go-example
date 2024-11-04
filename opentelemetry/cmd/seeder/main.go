@@ -8,7 +8,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/bccfilkom-be/go-example/opentelemetry/common"
 	"github.com/bccfilkom-be/go-example/opentelemetry/db/postgresql"
 	"github.com/go-faker/faker/v4"
 	"github.com/jackc/pgx/v5"
@@ -23,6 +22,7 @@ func init() {
 }
 
 func main() {
+	ctx := context.Background()
 	uri := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s",
 		os.Getenv("DB_USERNAME"),
@@ -35,7 +35,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	conn, err := common.NewPostgreSQL(cfg)
+	conn, err := postgresql.NewConn(ctx, cfg)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
