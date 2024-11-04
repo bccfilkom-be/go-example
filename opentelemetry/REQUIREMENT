@@ -1,0 +1,7 @@
+REQUIREMENT
+
+List Pets: An endpoint to retrieve a list of all pets.
+Get Pet by ID: Retrieve details of a specific pet by its unique identifier.
+Add Pet: Create a new pet entry.
+Update Pet: Modify details of an existing pet.
+Delete Pet: Remove a pet by ID.

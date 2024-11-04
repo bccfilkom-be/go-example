@@ -2,4 +2,3 @@
 ssh-password
 github-token
 .envrc
-flake.lock

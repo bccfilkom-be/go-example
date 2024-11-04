@@ -1,4 +1,4 @@
 simple_http/run:
 	@go run ./simple_http
 
-.PHONY: simple_http/run
+.PHONY: simple_http/run oas/validate
