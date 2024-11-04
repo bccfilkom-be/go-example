@@ -1,7 +1,7 @@
 {
   description = "A Nix-flake-based Go 1.22 development environment";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
+  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.0.tar.gz";
 
   outputs = {
     self,
@@ -32,8 +32,10 @@
           gopls
           gotools
           golangci-lint
+          k6
           nodePackages.sql-formatter
           sqlc
+          typescript
         ];
       };
     });

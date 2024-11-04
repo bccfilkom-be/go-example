@@ -10,6 +10,9 @@ run:
 seed:
 	@go run cmd/seeder/main.go
 
+test:
+	@cd test && hurl --test --very-verbose http.hurl
+
 goose/up:
 	@${goose_env} goose up
 
@@ -19,18 +22,12 @@ goose/status:
 sqlc/gen:
 	@cd db && sqlc generate
 
-test:
-	@cd test && hurl --test --very-verbose http.hurl
-
-compose/up:
-	@docker compose up -d
-
 compose/down:
-	@docker compose down
+	@docker compose --file deployment/compose.yaml down
 
 compose/fresh:
-	@docker compose down
-	@docker compose up -d --build
+	@docker compose --file deployment/compose.yaml down
+	@docker compose --file deployment/compose.yaml up --detach --build
 	# Waiting for database uptime
 	@sleep 4
 	@${goose_env} goose up
@@ -38,8 +35,8 @@ compose/fresh:
 	@go run cmd/seeder/main.go
 
 compose/restart:
-	@docker compose down
-	@docker compose up -d
+	@docker compose --file deployment/compose.yaml down
+	@docker compose --file deployment/compose.yaml up --detach
 	# Waiting for database uptime
 	@sleep 4
 	@${goose_env} goose up
