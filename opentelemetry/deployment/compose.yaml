@@ -1,0 +1,41 @@
+---
+services:
+  backend:
+    build: ..
+    restart: unless-stopped
+    expose:
+      - 8080
+      - 4813
+    ports:
+      - 8080:8080
+    depends_on:
+      postgresql:
+        condition: service_healthy
+        restart: true
+    env_file:
+      - ../.env
+    environment:
+      DB_HOST: postgresql
+
+  postgresql:
+    image: postgres:17.0-alpine3.20
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWD}
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c \"pg_isready -U ${DB_USERNAME} -d ${DB_NAME}\""]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.112.0
+    command: [ "--config=/etc/otel-collector.yaml" ]
+    volumes:
+      - ./otel-collector.yaml:/etc/otel-collector.yaml
+

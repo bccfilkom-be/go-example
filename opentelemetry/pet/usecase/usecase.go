@@ -28,7 +28,7 @@ func NewPetUsecase(postgresql *postgresql.Queries, tracer trace.Tracer) IPetUsec
 }
 
 func (u *usecase) ListPets(ctx context.Context, page, size int32) ([]dto.Pet, error) {
-	ctx, span := u.tracer.Start(ctx, "usecase")
+	ctx, span := u.tracer.Start(ctx, "ListPetsUsecase")
 	defer span.End()
 
 	pets, err := u.postgresql.ListPets(ctx, postgresql.ListPetsParams{Offset: page, Limit: paginationSize})
@@ -48,7 +48,7 @@ func (u *usecase) ListPets(ctx context.Context, page, size int32) ([]dto.Pet, er
 }
 
 func (u *usecase) GetPet(ctx context.Context, id int64) (dto.Pet, error) {
-	ctx, span := u.tracer.Start(ctx, "usecase")
+	ctx, span := u.tracer.Start(ctx, "GetPetUsecase")
 	defer span.End()
 
 	pet, err := u.postgresql.GetPet(ctx, id)
@@ -65,7 +65,7 @@ func (u *usecase) GetPet(ctx context.Context, id int64) (dto.Pet, error) {
 }
 
 func (u *usecase) CreatePet(ctx context.Context, pet *dto.Pet) error {
-	ctx, span := u.tracer.Start(ctx, "usecase")
+	ctx, span := u.tracer.Start(ctx, "CreatePetUsecase")
 	defer span.End()
 
 	if _, err := u.postgresql.CreatePet(ctx, postgresql.CreatePetParams{Name: pet.Name, PhotoUrl: pet.PhotoURL}); err != nil {
@@ -75,7 +75,7 @@ func (u *usecase) CreatePet(ctx context.Context, pet *dto.Pet) error {
 }
 
 func (u *usecase) UpdatePet(ctx context.Context, pet *dto.Pet) error {
-	ctx, span := u.tracer.Start(ctx, "usecase")
+	ctx, span := u.tracer.Start(ctx, "UpdatePetUsecase")
 	defer span.End()
 
 	if err := u.postgresql.UpdatePet(ctx, postgresql.UpdatePetParams{ID: pet.ID, Name: pet.Name}); err != nil {
@@ -85,7 +85,7 @@ func (u *usecase) UpdatePet(ctx context.Context, pet *dto.Pet) error {
 }
 
 func (u *usecase) DeletePet(ctx context.Context, id int64) error {
-	ctx, span := u.tracer.Start(ctx, "usecase")
+	ctx, span := u.tracer.Start(ctx, "DeletePetUsecase")
 	defer span.End()
 
 	return u.postgresql.DeletePet(ctx, id)

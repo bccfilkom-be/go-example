@@ -19,6 +19,7 @@ require (
 require (
 	ariga.io/atlas-go-sdk v0.2.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
+	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
@@ -37,9 +38,12 @@ require (
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/microsoft/go-mssqldb v1.6.0 // indirect
+	github.com/riandyrn/otelchi v0.10.1 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.56.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.31.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.31.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.31.0 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.31.0 // indirect
 	go.opentelemetry.io/otel/metric v1.31.0 // indirect
 	go.opentelemetry.io/otel/sdk/metric v1.31.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
