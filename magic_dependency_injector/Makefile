@@ -24,8 +24,13 @@ postgres:
 		--env POSTGRES_PASSWORD=${DB_PASSWD} \
 		--detach postgres:17.0-alpine3.20
 
+k6/run:
+	@k6 run test/script.js
+
 .PHONY:
 	sqlc/gen
 	goose/gen
 	goose/up
 	goose/status
+	postgres
+	k6/run
