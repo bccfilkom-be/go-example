@@ -27,6 +27,7 @@
       default = pkgs.mkShell {
         packages = with pkgs; [
           air
+          deno
           go
           goose
           gopls
@@ -35,7 +36,6 @@
           k6
           nodePackages.sql-formatter
           sqlc
-          typescript
         ];
       };
     });
