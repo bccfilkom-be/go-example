@@ -12,6 +12,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/core/router"
 	"go.uber.org/fx"
 )
 
@@ -20,26 +21,20 @@ func main() {
 		fx.Provide(
 			context.Background,
 			newPostgresqlConfig,
-			newRouter,
+			newServer,
 			postgresql.NewPool,
 			postgresql.New,
 			usecase.NewBookUsecase,
 		),
 		fx.Invoke(
 			handler.RegisterBookHTTP,
-			newServer,
 		),
 	).Run()
 }
 
-func newRouter() *iris.Application {
+func newServer(lc fx.Lifecycle) router.Party {
 	r := iris.New()
 	r.Use(iris.Compression)
-	return r
-}
-
-// FIX: decouple server from handler
-func newServer(lc fx.Lifecycle, r *iris.Application) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			port := 8080
@@ -51,6 +46,7 @@ func newServer(lc fx.Lifecycle, r *iris.Application) {
 			return r.Shutdown(ctx)
 		},
 	})
+	return r.Party("/api")
 }
 
 func newPostgresqlConfig() *pgxpool.Config {
