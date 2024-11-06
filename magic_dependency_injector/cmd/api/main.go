@@ -20,23 +20,26 @@ func main() {
 		fx.Provide(
 			context.Background,
 			newPostgresqlConfig,
+			newRouter,
 			postgresql.NewPool,
 			postgresql.New,
 			usecase.NewBookUsecase,
-			handler.NewBookHandler,
 		),
-		fx.Invoke(newIrisServer),
+		fx.Invoke(
+			handler.RegisterBookHTTP,
+			newServer,
+		),
 	).Run()
 }
 
-// FIX: decouple server from handler
-func newIrisServer(lc fx.Lifecycle, bookHandler handler.IBookHandler) *iris.Application {
+func newRouter() *iris.Application {
 	r := iris.New()
 	r.Use(iris.Compression)
-	v1 := r.Party("/api/v1")
-	books := v1.Party("/books")
-	books.Get("/", bookHandler.List)
-	books.Post("/", bookHandler.Create)
+	return r
+}
+
+// FIX: decouple server from handler
+func newServer(lc fx.Lifecycle, r *iris.Application) {
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			port := 8080
@@ -48,7 +51,6 @@ func newIrisServer(lc fx.Lifecycle, bookHandler handler.IBookHandler) *iris.Appl
 			return r.Shutdown(ctx)
 		},
 	})
-	return r
 }
 
 func newPostgresqlConfig() *pgxpool.Config {

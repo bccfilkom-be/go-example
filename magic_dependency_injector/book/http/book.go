@@ -1,4 +1,4 @@
-package handler
+package http
 
 import (
 	"net/http"
@@ -8,20 +8,18 @@ import (
 	"github.com/kataras/iris/v12"
 )
 
-type IBookHandler interface {
-	List(c iris.Context)
-	Create(c iris.Context)
-}
-
 type handler struct {
 	usecase usecase.IBookUsecase
 }
 
-func NewBookHandler(usecase usecase.IBookUsecase) IBookHandler {
-	return &handler{usecase}
+func RegisterBookHTTP(r *iris.Application, usecase usecase.IBookUsecase) {
+	h := handler{usecase}
+	books := r.Party("/books")
+	books.Get("/", h.list)
+	books.Post("/", h.create)
 }
 
-func (h *handler) List(c iris.Context) {
+func (h *handler) list(c iris.Context) {
 	books, err := h.usecase.ListBooks(c.Clone())
 	if err != nil {
 		c.StopWithProblem(http.StatusInternalServerError, iris.NewProblem().
@@ -31,8 +29,9 @@ func (h *handler) List(c iris.Context) {
 	c.JSON(books)
 }
 
-func (h *handler) Create(c iris.Context) {
+func (h *handler) create(c iris.Context) {
 	var b postgresql.Book
+
 	if err := c.ReadJSON(&b); err != nil {
 		c.StopWithProblem(iris.StatusBadRequest, iris.NewProblem().
 			DetailErr(err))
