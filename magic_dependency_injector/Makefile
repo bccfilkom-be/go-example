@@ -4,6 +4,9 @@ goose_conn=GOOSE_DRIVER=${DB_DRIVER} GOOSE_DBSTRING="postgres://${DB_USERNAME}:$
 migration_dir=./db/migrations/
 goose_env=${goose_conn} GOOSE_MIGRATION_DIR=${migration_dir}
 
+run:
+	go run cmd/api/main.go
+
 sqlc/gen:
 	@cd db && sqlc generate
 
@@ -28,6 +31,7 @@ k6/run:
 	@k6 run test/script.js
 
 .PHONY:
+	run
 	sqlc/gen
 	goose/gen
 	goose/up
